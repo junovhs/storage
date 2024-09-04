@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSC Cruise Deals Scraper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #urlInput {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #dealsContent {
+            margin-top: 20px;
+            position: relative;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        #copyButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #copyButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>MSC Cruise Deals Scraper</h1>
+    <form id="urlForm">
+        <input type="text" id="urlInput" name="url" placeholder="Enter URL to scrape">
+        <button type="button" onclick="fetchDeals()">Fetch Deals</button>
+    </form>
+    <button onclick="fetchMSCDeals()">MSC Deals</button>
+    <div id="dealsContentWrapper">
+        <div id="dealsContent"></div>
+    </div>
+
+    <script>
+        function fetchMSCDeals() {
+            const mscUrl = 'https://www.msccruisesusa.com/cruise-deals/promo-terms-and-conditions';
+            fetchDealsFromUrl(mscUrl);
+        }
+
+        function fetchDeals() {
+            const url = document.getElementById('urlInput').value;
+            fetchDealsFromUrl(url);
+        }
+
+        function fetchDealsFromUrl(url) {
+            fetch(`/fetch_deals?url=${encodeURIComponent(url)}`)
+                .then(response => response.text())
+                .then(data => {
+                    const dealsContentWrapper = document.getElementById('dealsContentWrapper');
+                    dealsContentWrapper.innerHTML = `
+                        <div id="dealsContent">
+                            <button id="copyButton" onclick="copyContent()">Copy</button>
+                            <pre>${data}</pre>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('dealsContent').innerText = 'An error occurred while fetching deals.';
+                });
+        }
+
+        function copyContent() {
+            const content = document.querySelector('#dealsContent pre').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Content copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
